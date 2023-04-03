@@ -10,19 +10,19 @@
 
   const host       = process.env.HOST || 'localhost'
   const port       = process.env.PORT || 1234
-  const CERTFolder = process.env.CERT || ''
+  const CERTPrefix = process.env.CERT || ''
 
   console.clear()
 
   let KeyFilePath, CERTFilePath
-  if (CERTFolder !== '') {
-    KeyFilePath = path.join(CERTFolder,'privkey.pem')
+  if (CERTPrefix !== '') {
+    KeyFilePath = CERTPrefix + '.key'
     if (! fs.existsSync(KeyFilePath)) {
       console.error('no key file at "' + KeyFilePath + '"')
       process.exit(1)
     }
 
-    CERTFilePath = path.join(CERTFolder,'fullchain.pem')
+    CERTFilePath = CERTPrefix + '.crt'
     if (! fs.existsSync(CERTFilePath)) {
       console.error('no cert file at "' + CERTFilePath + '"')
       process.exit(1)
@@ -30,7 +30,7 @@
   }
 
   let server
-  if (CERTFolder !== '') {
+  if (CERTPrefix !== '') {
     server = https.createServer({
       key:  fs.readFileSync(KeyFilePath),
       cert: fs.readFileSync(CERTFilePath)
