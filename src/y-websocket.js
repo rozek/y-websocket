@@ -128,7 +128,13 @@ const readMessage = (provider, buf, emitSynced) => {
  */
 const setupWS = (provider) => {
   if (provider.shouldConnect && provider.ws === null) {
-    const websocket = new provider._WS(provider.url)
+    let websocket
+      try {
+        websocket = new provider._WS(provider.url)
+      } catch (Signal) {
+        console.error('failed opening websocket, reason:',Signal)
+        throw Signal
+      }
     websocket.binaryType = 'arraybuffer'
     provider.ws = websocket
     provider.wsconnecting = true
