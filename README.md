@@ -1,5 +1,8 @@
 
 # y-websocket :tophat:
+
+> this repository is basically a copy of the original [yjs/y-websocket](https://github.com/yjs/y-websocket), but with support for `wss`. With all the restrictions imposed by today's browsers, this comes in very handy, e.g., if you try to test data sharing in your local network at home
+
 > WebSocket Provider for Yjs
 
 The Websocket Provider implements a classical client server model. Clients connect to a single endpoint over Websocket. The server distributes awareness information and document updates among clients.
