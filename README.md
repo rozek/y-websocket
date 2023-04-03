@@ -45,7 +45,7 @@ This command assumes that
 
 With these changes, the server will use `wss` instead of `ws`
 
-The question is now how to obtain these two files. Unless your server is publically accessible and has an "official" certificate (e.g., issued by [Let's Encrypt](https://letsencrypt.org/)), you will have to setup your own small "certifcate authority" (CA) and let any system, that attempts to connect to your server, trust this CA. You may then use it to generate the required certificate.
+The question is now how to obtain these two files. Unless your server is publically accessible and has an "official" certificate (e.g., issued by [Let's Encrypt](https://letsencrypt.org/)), you will have to setup your own small "certificate authority" (CA) and let any system, that attempts to connect to your server, trust this CA. You may then use it to generate the required certificate.
 
 **Fortunately, doing so is much simpler than you may expect**, just follow the instructions on [deliciousbrains.com](https://deliciousbrains.com/ssl-certificate-authority-for-local-https-development/)
 
