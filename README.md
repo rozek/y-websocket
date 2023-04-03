@@ -24,11 +24,30 @@ npm i y-websocket
 
 This repository implements a basic server that you can adopt to your specific use-case. [(source code)](./bin/)
 
-Start a y-websocket server:
+Start a y-websocket server without `wss` support:
 
 ```sh
 HOST=localhost PORT=1234 npx y-websocket
 ```
+
+If you need a server that also supports `wss`, use the following command:
+
+```sh
+CERT=./mac-mini HOST=mac-mini.local PORT=1234 npx y-websocket
+```
+
+This command assumes that
+
+* your host has the local name `mac-mini` (`.local` is added by the system itself)
+* you have two files, namely
+  * `./mac-mini.key` with your server's private key and
+  * `./mac-mini.crt` with a signed certifcate for your server<br>(i.e., you have to specify the relative path to these files including their name but excluding their file type extensions)
+
+With these changes, the server will use `wss` instead of `ws`
+
+The question is now how to obtains these two files. Unless your server is publically accessible and has an "official" certificate (e.g., issued by [Let's Encrypt](https://letsencrypt.org/), you will have to setup your own small "certifcate authority" (CA) and let any system, that attempts to connect to your server, trust this CA. You may then use it to generate the required certificate.
+
+**Fortunately, doing so is much simpler than you may expect**, just follow the instructions on [deliciousbrains.com](https://deliciousbrains.com/ssl-certificate-authority-for-local-https-development/)
 
 ### Client Code:
 
