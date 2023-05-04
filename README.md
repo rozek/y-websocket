@@ -40,7 +40,15 @@ If you need a server that also supports `wss`, use the following command:
 CERT=./mac-mini HOST=mac-mini.local PORT=1234 npx y-websocket
 ```
 
-This command assumes that
+or
+
+```sh
+CERT=./mac-mini HOST=0.0.0.0 PORT=1234 npx y-websocket
+```
+
+if you want your server to accept requests from other hosts.
+
+Both commands assume that
 
 * your host has the local name `mac-mini` (`.local` is added by the system itself)
 * you have two files, namely
