@@ -43,6 +43,7 @@ var url__namespace = /*#__PURE__*/_interopNamespaceDefault(url);
  * @module provider/websocket
  */
 
+
 const messageSync = 0;
 const messageQueryAwareness = 3;
 const messageAwareness = 1;
