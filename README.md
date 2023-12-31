@@ -21,7 +21,7 @@ The Websocket Provider is a solid choice if you want a central source that handl
 ### Install dependencies
 
 ```sh
-npm i y-websocket
+npm i rozek/y-websocket
 ```
 
 ### Start a y-websocket server
