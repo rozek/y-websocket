@@ -31,19 +31,19 @@ This repository implements a basic server that you can adopt to your specific us
 Start a y-websocket server without `wss` support:
 
 ```sh
-HOST=localhost PORT=1234 npx y-websocket
+HOST=localhost PORT=1234 npx rozek/y-websocket
 ```
 
 If you need a server that also supports `wss`, use the following command:
 
 ```sh
-CERT=./mac-mini HOST=mac-mini.local PORT=1234 npx y-websocket
+CERT=./mac-mini HOST=mac-mini.local PORT=1234 npx rozek/y-websocket
 ```
 
 or
 
 ```sh
-CERT=./mac-mini HOST=0.0.0.0 PORT=1234 npx y-websocket
+CERT=./mac-mini HOST=0.0.0.0 PORT=1234 npx rozek/y-websocket
 ```
 
 if you want your server to accept requests from other hosts.
