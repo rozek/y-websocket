@@ -1,13 +1,15 @@
 
 # y-websocket :tophat:
 
+WebSocket Provider for Yjs
+
 > this repository is basically a copy of the original [yjs/y-websocket](https://github.com/yjs/y-websocket), but with support for `wss`. With all the restrictions imposed by today's browsers, this comes in very handy, e.g., if you try to test data sharing in your local network at home
 >
 > In order to install this package, please use `npm install rozek/y-websocket`
 >
+> If you plan to use y-websocket from within a Docker container, this repository contains a Dockerfile and related instructions for you.
+>
 > **Important: if you plan to use Yjs in a "no-build environment" (i.e., without using a module bundler such as [webpack](https://webpack.js.org/) or [Rollup](https://rollupjs.org/)), please import from my [Yjs bundle](https://github.com/rozek/yjs-bundle) in order to avoid a [serious Yjs issue](https://github.com/yjs/yjs/issues/438)!**
-
-> WebSocket Provider for Yjs
 
 The Websocket Provider implements a classical client server model. Clients connect to a single endpoint over Websocket. The server distributes awareness information and document updates among clients.
 
@@ -60,6 +62,42 @@ With these changes, the server will use `wss` instead of `ws`
 The question is now how to obtain these two files. Unless your server is publically accessible and has an "official" certificate (e.g., issued by [Let's Encrypt](https://letsencrypt.org/)), you will have to setup your own small "certificate authority" (CA) and let any system, that attempts to connect to your server, trust this CA. You may then use it to generate the required certificate.
 
 **Fortunately, doing so is much simpler than you may expect**, just follow the instructions on [deliciousbrains.com](https://deliciousbrains.com/ssl-certificate-authority-for-local-https-development/)
+
+### Use y-websocket from within a Docker Container ###
+
+This section assumes some basic understanding of [Docker](https://www.docker.com/) itself, Docker images and containers and how to manage them.
+
+A simple and light-weight Docker image may be build using a `Dockerfile` based on the following [template](https://raw.githubusercontent.com/rozek/y-websocket/main/Dockerfile):
+
+```
+FROM alpine:latest
+
+RUN apk update \
+ && apk add --update nodejs npm git \
+ && mkdir /y-websocket \
+ && cd /y-websocket \
+ && npm i rozek/y-websocket
+
+CMD ["/bin/ash","-c","cd /y-websocket && CERT=/cert/XXX HOST=0.0.0.0 PORT=1234 npx rozek/y-websocket"]
+```
+
+Just replace the `XXX` placeholder by the base name of your certificate files (i.e., without the suffixes `.key` and `.crt`) 
+
+In order to build the Docker image, navigate to the folder containing the above Dockerfile and run the following command
+
+```
+docker build -t y-websocket .
+```
+
+Upon completion, you are ready to start a container for the created image, e.g., using the following command
+
+```
+docker run -d -v XXX:/cert -p YYY:1234 --restart=always -it y-websocket
+```
+
+where `XXX` is the path to a folder on the "host system" (i.e., the computer running Docker and its containers) containing your server certificate files and `YYY` is the host's TCP port that should be mapped onto the container's port 1234 (if you don't want to change the port number, simply set `YYY` to `1234`)
+
+If you don't want to run the Docker container in the background, just omit the `-d` flag. If you don't want the container to be restarted after a reboot or upon a crash, simple omit the `--restart=always` argument
 
 ### Client Code:
 
