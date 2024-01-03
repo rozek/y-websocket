@@ -7,7 +7,7 @@ WebSocket Provider for Yjs
 >
 > In order to install this package, please use `npm install rozek/y-websocket`
 >
-> If you plan to use y-websocket from within a [Docker](https://www.docker.com/) container, this repository contains a [Dockerfile template](https://raw.githubusercontent.com/rozek/y-websocket/main/Dockerfile) and related [instructions](#use-y-websocket-from-within-a-docker-container) for you.
+> If you plan to run a y-websocket server within a [Docker](https://www.docker.com/) container, this repository contains a [Dockerfile template](https://raw.githubusercontent.com/rozek/y-websocket/main/Dockerfile) and related [instructions](#use-y-websocket-from-within-a-docker-container) for you.
 >
 > **Important: if you plan to use Yjs in a "no-build environment" (i.e., without using a module bundler such as [webpack](https://webpack.js.org/) or [Rollup](https://rollupjs.org/)), please import from my [Yjs bundle](https://github.com/rozek/yjs-bundle) in order to avoid a [serious Yjs issue](https://github.com/yjs/yjs/issues/438)!**
 
@@ -63,11 +63,11 @@ The question is now how to obtain these two files. Unless your server is publica
 
 **Fortunately, doing so is much simpler than you may expect**, just follow the instructions on [deliciousbrains.com](https://deliciousbrains.com/ssl-certificate-authority-for-local-https-development/)
 
-### Use y-websocket from within a Docker Container ###
+### Run a y-websocket Server within a Docker Container ###
 
 This section assumes some basic understanding of [Docker](https://www.docker.com/) itself, Docker images and containers and how to manage them.
 
-A simple and light-weight Docker image may be build using a `Dockerfile` based on the following [template](https://raw.githubusercontent.com/rozek/y-websocket/main/Dockerfile):
+A simple and light-weight Docker image for a y-websocket server may be built using a `Dockerfile` based on the following [template](https://raw.githubusercontent.com/rozek/y-websocket/main/Dockerfile):
 
 ```
 FROM alpine:latest
@@ -83,7 +83,7 @@ CMD ["/bin/ash","-c","cd /y-websocket && CERT=/cert/XXX HOST=0.0.0.0 PORT=1234 n
 
 Just replace the `XXX` placeholder by the base name of your certificate files (i.e., without the suffixes `.key` and `.crt`) 
 
-In order to build the Docker image, navigate to the folder containing the above Dockerfile and run the following command
+In order to build the Docker image, navigate to the folder containing your customized Dockerfile and run the following command
 
 ```
 docker build -t y-websocket .
@@ -95,9 +95,9 @@ Upon completion, you are ready to start a container for the created image, e.g.,
 docker run -d -v XXX:/cert -p YYY:1234 --restart=always -it y-websocket
 ```
 
-where `XXX` is the path to a folder on the "host system" (i.e., the computer running Docker and its containers) containing your server certificate files and `YYY` is the host's TCP port that should be mapped onto the container's port 1234 (if you don't want to change the port number, simply set `YYY` to `1234`)
+where `XXX` is the path to a folder on the "host system" (i.e., the computer running Docker and its containers) containing your server certificate files, and `YYY` is the host's TCP port that should be mapped onto the container's port 1234 (if you don't want to change the port number, simply set `YYY` to `1234`)
 
-If you don't want to run the Docker container in the background, just omit the `-d` flag. If you don't want the container to be restarted after a reboot or upon a crash, simple omit the `--restart=always` argument
+If you don't want to run the Docker container in the background, just omit the `-d` flag. If you don't want the container to be restarted after a reboot or upon a crash, simply omit `--restart=always`.
 
 ### Client Code:
 
