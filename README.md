@@ -7,7 +7,7 @@ WebSocket Provider for Yjs
 >
 > In order to install this package, please use `npm install rozek/y-websocket`
 >
-> If you plan to run a y-websocket server within a [Docker](https://www.docker.com/) container, this repository contains a [Dockerfile template](https://raw.githubusercontent.com/rozek/y-websocket/main/Dockerfile) and related [instructions](#use-y-websocket-from-within-a-docker-container) for you.
+> If you plan to run a y-websocket server within a [Docker](https://www.docker.com/) container, this repository contains a [Dockerfile template](https://raw.githubusercontent.com/rozek/y-websocket/main/Dockerfile) and related [instructions](#run-a-y-websocket-server-within-a-docker-container) for you.
 >
 > **Important: if you plan to use Yjs in a "no-build environment" (i.e., without using a module bundler such as [webpack](https://webpack.js.org/) or [Rollup](https://rollupjs.org/)), please import from my [Yjs bundle](https://github.com/rozek/yjs-bundle) in order to avoid a [serious Yjs issue](https://github.com/yjs/yjs/issues/438)!**
 
