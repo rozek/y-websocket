@@ -1,10 +1,9 @@
-FROM node:12-alpine
+FROM alpine:latest
 
-RUN mkdir -p /home/node/app/node_modules && chown -R node:node /home/node/app
-WORKDIR /home/node/app
-COPY package*.json ./
-USER node
-RUN npm install
-COPY --chown=node:node . .
-EXPOSE 1234
-CMD [ "npm", "start" ]
+RUN apk update \
+ && apk add --update nodejs npm git \
+ && mkdir /y-websocket \
+ && cd /y-websocket \
+ && npm i rozek/y-websocket
+
+CMD ["/bin/ash","-c","cd /y-websocket && CERT=/cert/XXX HOST=0.0.0.0 PORT=1234 npx rozek/y-websocket"]
