@@ -12,6 +12,7 @@
   },
   "scripts": {
     "start": "node ./bin/server.js",
+    "build": "npm run dist",
     "dist": "rm -rf dist && rollup -c && tsc",
     "lint": "standard && tsc",
     "test": "npm run lint",
