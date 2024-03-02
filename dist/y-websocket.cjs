@@ -11,6 +11,7 @@ var awarenessProtocol = require('y-protocols/dist/awareness.cjs');
 var observable = require('lib0/dist/observable.cjs');
 var math = require('lib0/dist/math.cjs');
 var url = require('lib0/dist/url.cjs');
+var env = require('lib0/dist/environment.cjs');
 
 function _interopNamespaceDefault(e) {
   var n = Object.create(null);
@@ -38,6 +39,7 @@ var authProtocol__namespace = /*#__PURE__*/_interopNamespaceDefault(authProtocol
 var awarenessProtocol__namespace = /*#__PURE__*/_interopNamespaceDefault(awarenessProtocol);
 var math__namespace = /*#__PURE__*/_interopNamespaceDefault(math);
 var url__namespace = /*#__PURE__*/_interopNamespaceDefault(url);
+var env__namespace = /*#__PURE__*/_interopNamespaceDefault(env);
 
 /**
  * @module provider/websocket
@@ -384,17 +386,15 @@ class WebsocketProvider extends observable.Observable {
       );
       broadcastMessage(this, encoding__namespace.toUint8Array(encoder));
     };
-    this._unloadHandler = () => {
+    this._exitHandler = () => {
       awarenessProtocol__namespace.removeAwarenessStates(
         this.awareness,
         [doc.clientID],
-        'window unload'
+        'app closed'
       );
     };
-    if (typeof window !== 'undefined') {
-      window.addEventListener('unload', this._unloadHandler);
-    } else if (typeof process !== 'undefined') {
-      process.on('exit', this._unloadHandler);
+    if (env__namespace.isNode && typeof process !== 'undefined') {
+      process.on('exit', this._exitHandler);
     }
     awareness.on('update', this._awarenessUpdateHandler);
     this._checkInterval = /** @type {any} */ (setInterval(() => {
@@ -434,10 +434,8 @@ class WebsocketProvider extends observable.Observable {
     }
     clearInterval(this._checkInterval);
     this.disconnect();
-    if (typeof window !== 'undefined') {
-      window.removeEventListener('unload', this._unloadHandler);
-    } else if (typeof process !== 'undefined') {
-      process.off('exit', this._unloadHandler);
+    if (env__namespace.isNode && typeof process !== 'undefined') {
+      process.off('exit', this._exitHandler);
     }
     this.awareness.off('update', this._awarenessUpdateHandler);
     this.doc.off('update', this._updateHandler);
