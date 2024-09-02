@@ -23,18 +23,20 @@ export class WebsocketProvider extends Observable<string> {
      * @param {object} opts
      * @param {boolean} [opts.connect]
      * @param {awarenessProtocol.Awareness} [opts.awareness]
-     * @param {Object<string,string>} [opts.params]
+     * @param {Object<string,string>} [opts.params] specify url parameters
+     * @param {Array<string>} [opts.protocols] specify websocket protocols
      * @param {typeof WebSocket} [opts.WebSocketPolyfill] Optionall provide a WebSocket polyfill
      * @param {number} [opts.resyncInterval] Request server state every `resyncInterval` milliseconds
      * @param {number} [opts.maxBackoffTime] Maximum amount of time to wait before trying to reconnect (we try to reconnect using exponential backoff)
      * @param {boolean} [opts.disableBc] Disable cross-tab BroadcastChannel communication
      */
-    constructor(serverUrl: string, roomname: string, doc: Y.Doc, { connect, awareness, params, WebSocketPolyfill, resyncInterval, maxBackoffTime, disableBc }?: {
+    constructor(serverUrl: string, roomname: string, doc: Y.Doc, { connect, awareness, params, protocols, WebSocketPolyfill, resyncInterval, maxBackoffTime, disableBc }?: {
         connect?: boolean | undefined;
         awareness?: awarenessProtocol.Awareness | undefined;
         params?: {
             [x: string]: string;
         } | undefined;
+        protocols?: string[] | undefined;
         WebSocketPolyfill?: {
             new (url: string | URL, protocols?: string | string[] | undefined): WebSocket;
             prototype: WebSocket;
@@ -47,9 +49,18 @@ export class WebsocketProvider extends Observable<string> {
         maxBackoffTime?: number | undefined;
         disableBc?: boolean | undefined;
     });
-    maxBackoffTime: number;
+    serverUrl: string;
     bcChannel: string;
-    url: string;
+    maxBackoffTime: number;
+    /**
+     * The specified url parameters. This can be safely updated. The changed parameters will be used
+     * when a new connection is established.
+     * @type {Object<string,string>}
+     */
+    params: {
+        [x: string]: string;
+    };
+    protocols: string[];
     roomname: string;
     doc: Y.Doc;
     _WS: {
@@ -103,6 +114,7 @@ export class WebsocketProvider extends Observable<string> {
     _awarenessUpdateHandler: ({ added, updated, removed }: any, _origin: any) => void;
     _exitHandler: () => void;
     _checkInterval: any;
+    get url(): string;
     set synced(arg: boolean);
     /**
      * @type {boolean}

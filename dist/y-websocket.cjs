@@ -160,7 +160,7 @@ const setupWS = (provider) => {
   if (provider.shouldConnect && provider.ws === null) {
     let websocket;
       try {
-        websocket = new provider._WS(provider.url);
+        websocket = new provider._WS(provider.url, provider.protocols);
       } catch (Signal) {
         console.error('failed opening websocket, reason:',Signal);
         throw Signal
@@ -280,7 +280,8 @@ class WebsocketProvider extends observable.Observable {
    * @param {object} opts
    * @param {boolean} [opts.connect]
    * @param {awarenessProtocol.Awareness} [opts.awareness]
-   * @param {Object<string,string>} [opts.params]
+   * @param {Object<string,string>} [opts.params] specify url parameters
+   * @param {Array<string>} [opts.protocols] specify websocket protocols
    * @param {typeof WebSocket} [opts.WebSocketPolyfill] Optionall provide a WebSocket polyfill
    * @param {number} [opts.resyncInterval] Request server state every `resyncInterval` milliseconds
    * @param {number} [opts.maxBackoffTime] Maximum amount of time to wait before trying to reconnect (we try to reconnect using exponential backoff)
@@ -290,6 +291,7 @@ class WebsocketProvider extends observable.Observable {
     connect = true,
     awareness = new awarenessProtocol__namespace.Awareness(doc),
     params = {},
+    protocols = [],
     WebSocketPolyfill = WebSocket,
     resyncInterval = -1,
     maxBackoffTime = 2500,
@@ -300,11 +302,16 @@ class WebsocketProvider extends observable.Observable {
     while (serverUrl[serverUrl.length - 1] === '/') {
       serverUrl = serverUrl.slice(0, serverUrl.length - 1);
     }
-    const encodedParams = url__namespace.encodeQueryParams(params);
-    this.maxBackoffTime = maxBackoffTime;
+    this.serverUrl = serverUrl;
     this.bcChannel = serverUrl + '/' + roomname;
-    this.url = serverUrl + '/' + roomname +
-      (encodedParams.length === 0 ? '' : '?' + encodedParams);
+    this.maxBackoffTime = maxBackoffTime;
+    /**
+     * The specified url parameters. This can be safely updated. The changed parameters will be used
+     * when a new connection is established.
+     * @type {Object<string,string>}
+     */
+    this.params = params;
+    this.protocols = protocols;
     this.roomname = roomname;
     this.doc = doc;
     this._WS = WebSocketPolyfill;
@@ -411,6 +418,12 @@ class WebsocketProvider extends observable.Observable {
     if (connect) {
       this.connect();
     }
+  }
+
+  get url () {
+    const encodedParams = url__namespace.encodeQueryParams(this.params);
+    return this.serverUrl + '/' + this.roomname +
+      (encodedParams.length === 0 ? '' : '?' + encodedParams)
   }
 
   /**
