@@ -7,7 +7,7 @@
   const number    = require('lib0/number')
   const WebSocket = require('ws')
 
-  const setupWSConnection = require('./utils.js').setupWSConnection
+  const setupWSConnection = require('./utils.cjs').setupWSConnection
 
   const host       = process.env.HOST || 'localhost'
   const port       = number.parseInt(process.env.PORT || '1234')
