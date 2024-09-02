@@ -4,17 +4,18 @@
   const path      = require('path')
   const http      = require('http')
   const https     = require('https')
+  const number    = require('lib0/number')
   const WebSocket = require('ws')
 
   const setupWSConnection = require('./utils.js').setupWSConnection
 
   const host       = process.env.HOST || 'localhost'
-  const port       = process.env.PORT || 1234
+  const port       = number.parseInt(process.env.PORT || '1234')
   const CERTPrefix = process.env.CERT || ''
 
   console.clear()
 
-  let KeyFilePath, CERTFilePath
+  let KeyFilePath = '', CERTFilePath = ''
   if (CERTPrefix !== '') {
     KeyFilePath = CERTPrefix + '.key'
     if (! fs.existsSync(KeyFilePath)) {

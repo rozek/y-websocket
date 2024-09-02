@@ -1,18 +1,18 @@
 const Y = require('yjs')
-const syncProtocol = require('y-protocols/dist/sync.cjs')
-const awarenessProtocol = require('y-protocols/dist/awareness.cjs')
+const syncProtocol = require('y-protocols/sync')
+const awarenessProtocol = require('y-protocols/awareness')
 
-const encoding = require('lib0/dist/encoding.cjs')
-const decoding = require('lib0/dist/decoding.cjs')
-const map = require('lib0/dist/map.cjs')
+const encoding = require('lib0/encoding')
+const decoding = require('lib0/decoding')
+const map = require('lib0/map')
 
 const debounce = require('lodash.debounce')
 
-const callbackHandler = require('./callback.js').callbackHandler
-const isCallbackSet = require('./callback.js').isCallbackSet
+const callbackHandler = require('./callback.cjs').callbackHandler
+const isCallbackSet = require('./callback.cjs').isCallbackSet
 
-const CALLBACK_DEBOUNCE_WAIT = parseInt(process.env.CALLBACK_DEBOUNCE_WAIT) || 2000
-const CALLBACK_DEBOUNCE_MAXWAIT = parseInt(process.env.CALLBACK_DEBOUNCE_MAXWAIT) || 10000
+const CALLBACK_DEBOUNCE_WAIT = parseInt(process.env.CALLBACK_DEBOUNCE_WAIT || '2000')
+const CALLBACK_DEBOUNCE_MAXWAIT = parseInt(process.env.CALLBACK_DEBOUNCE_MAXWAIT || '10000')
 
 const wsReadyStateConnecting = 0
 const wsReadyStateOpen = 1
@@ -42,7 +42,7 @@ if (typeof persistenceDir === 'string') {
         ldb.storeUpdate(docName, update)
       })
     },
-    writeState: async (docName, ydoc) => {}
+    writeState: async (_docName, _ydoc) => {}
   }
 }
 
@@ -73,15 +73,31 @@ const messageAwareness = 1
 
 /**
  * @param {Uint8Array} update
- * @param {any} origin
+ * @param {any} _origin
  * @param {WSSharedDoc} doc
+ * @param {any} _tr
  */
-const updateHandler = (update, origin, doc) => {
+const updateHandler = (update, _origin, doc, _tr) => {
   const encoder = encoding.createEncoder()
   encoding.writeVarUint(encoder, messageSync)
   syncProtocol.writeUpdate(encoder, update)
   const message = encoding.toUint8Array(encoder)
   doc.conns.forEach((_, conn) => send(doc, conn, message))
+}
+
+/**
+ * @type {(ydoc: Y.Doc) => Promise<void>}
+ */
+let contentInitializor = _ydoc => Promise.resolve()
+
+/**
+ * This function is called once every time a Yjs document is created. You can
+ * use it to pull data from an external source or initialize content.
+ *
+ * @param {(ydoc: Y.Doc) => Promise<void>} f
+ */
+exports.setContentInitializor = (f) => {
+  contentInitializor = f
 }
 
 class WSSharedDoc extends Y.Doc {
@@ -124,16 +140,19 @@ class WSSharedDoc extends Y.Doc {
       })
     }
     this.awareness.on('update', awarenessChangeHandler)
-    this.on('update', updateHandler)
+    this.on('update', /** @type {any} */ (updateHandler))
     if (isCallbackSet) {
-      this.on('update', debounce(
+      this.on('update', /** @type {any} */ (debounce(
         callbackHandler,
         CALLBACK_DEBOUNCE_WAIT,
         { maxWait: CALLBACK_DEBOUNCE_MAXWAIT }
-      ))
+      )))
     }
+    this.whenInitialized = contentInitializor(this)
   }
 }
+
+exports.WSSharedDoc = WSSharedDoc
 
 /**
  * Gets a Y.Doc by name, whether in memory or on disk
@@ -183,6 +202,7 @@ const messageListener = (conn, doc, message) => {
     }
   } catch (err) {
     console.error(err)
+    // @ts-ignore
     doc.emit('error', [err])
   }
 }
@@ -213,7 +233,7 @@ const closeConn = (doc, conn) => {
 
 /**
  * @param {WSSharedDoc} doc
- * @param {any} conn
+ * @param {import('ws').WebSocket} conn
  * @param {Uint8Array} m
  */
 const send = (doc, conn, m) => {
@@ -221,7 +241,7 @@ const send = (doc, conn, m) => {
     closeConn(doc, conn)
   }
   try {
-    conn.send(m, /** @param {any} err */ err => { err != null && closeConn(doc, conn) })
+    conn.send(m, {}, err => { err != null && closeConn(doc, conn) })
   } catch (e) {
     closeConn(doc, conn)
   }
@@ -230,11 +250,11 @@ const send = (doc, conn, m) => {
 const pingTimeout = 30000
 
 /**
- * @param {any} conn
- * @param {any} req
+ * @param {import('ws').WebSocket} conn
+ * @param {import('http').IncomingMessage} req
  * @param {any} opts
  */
-exports.setupWSConnection = (conn, req, { docName = req.url.slice(1).split('?')[0], gc = true } = {}) => {
+exports.setupWSConnection = (conn, req, { docName = (req.url || '').slice(1).split('?')[0], gc = true } = {}) => {
   conn.binaryType = 'arraybuffer'
   // get doc, initialize if it does not exist yet
   const doc = getYDoc(docName, gc)

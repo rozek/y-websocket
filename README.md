@@ -11,12 +11,30 @@ WebSocket Provider for Yjs
 >
 > **Important: if you plan to use Yjs in a "no-build environment" (i.e., without using a module bundler such as [webpack](https://webpack.js.org/) or [Rollup](https://rollupjs.org/)), please import from my [Yjs bundle](https://github.com/rozek/yjs-bundle) in order to avoid a [serious Yjs issue](https://github.com/yjs/yjs/issues/438)!**
 
-The Websocket Provider implements a classical client server model. Clients connect to a single endpoint over Websocket. The server distributes awareness information and document updates among clients.
+The Websocket Provider implements a classical client server model. Clients
+connect to a single endpoint over Websocket. The server distributes awareness
+information and document updates among clients.
 
-The Websocket Provider is a solid choice if you want a central source that handles authentication and authorization. Websockets also send header information and cookies, so you can use existing authentication mechanisms with this server.
+This repository contains a simple in-memory backend that can persist to
+databases, but it can't be scaled easily. The
+[y-redis](https://github.com/yjs/y-redis/) repository contains an alternative
+backend that is scalable, provides auth*, and can persist to different backends.
 
-* Supports cross-tab communication. When you open the same document in the same browser, changes on the document are exchanged via cross-tab communication ([Broadcast Channel](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API) and [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) as fallback).
+The Websocket Provider is a solid choice if you want a central source that
+handles authentication and authorization. Websockets also send header
+information and cookies, so you can use existing authentication mechanisms with
+this server.
+
+* Supports cross-tab communication. When you open the same document in the same
+browser, changes on the document are exchanged via cross-tab communication
+([Broadcast
+Channel](https://developer.mozilla.org/en-US/docs/Web/API/Broadcast_Channel_API)
+and
+[localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)
+as fallback).
 * Supports exchange of awareness information (e.g. cursors).
+
+
 
 ## Quick Start
 
@@ -144,7 +162,7 @@ import { WebsocketProvider } from 'y-websocket'
 wsOpts = {
   // Set this to `false` if you want to connect manually using wsProvider.connect()
   connect: true,
-  // Specify a query-string that will be url-encoded and attached to the `serverUrl`
+  // Specify a query-string / url parameters that will be url-encoded and attached to the `serverUrl`
   // I.e. params = { auth: "bearer" } will be transformed to "?auth=bearer"
   params: {}, // Object<string,string>
   // You may polyill the Websocket object (https://developer.mozilla.org/en-US/docs/Web/API/WebSocket).
@@ -168,6 +186,10 @@ wsOpts = {
   <dd>True if this instance is currently communicating to other browser-windows via BroadcastChannel.</dd>
   <b><code>wsProvider.synced: boolean</code></b>
   <dd>True if this instance is currently connected and synced with the server.</dd>
+  <b><code>wsProvider.params : boolean</code></b>
+  <dd>The specified url parameters. This can be safely updated, the new values
+    will be used when a new connction is established. If this contains an
+    auth token, it should be updated regularly.</dd>
   <b><code>wsProvider.disconnect()</code></b>
   <dd>Disconnect from the server and don't try to reconnect.</dd>
   <b><code>wsProvider.connect()</code></b>
