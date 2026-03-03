@@ -2,6 +2,8 @@
 
 WebSocket Provider for Yjs
 
+## The WebSocket Server for Yjs has been moved into a separate repository - this makes my changes in this one useless - navigate to [y-websocket-server](https://github.com/rozek/y-websocket-server) instead
+
 > this repository is basically a copy of the original [yjs/y-websocket](https://github.com/yjs/y-websocket), but with support for `wss`. With all the restrictions imposed by today's browsers, this comes in very handy, e.g., if you try to test data sharing in your local network at home
 >
 > In order to install this package, please use `npm install rozek/y-websocket`
