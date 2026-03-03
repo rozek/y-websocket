@@ -1,4 +1,3 @@
-
 # y-websocket :tophat:
 
 WebSocket Provider for Yjs
@@ -34,8 +33,6 @@ and
 as fallback).
 * Supports exchange of awareness information (e.g. cursors).
 
-
-
 ## Quick Start
 
 ### Install dependencies
@@ -46,12 +43,26 @@ npm i rozek/y-websocket
 
 ### Start a y-websocket server
 
-This repository implements a basic server that you can adopt to your specific use-case. [(source code)](./bin/)
+There are multiple y-websocket compatible backends for `y-websocket` without `wss` support: 
 
-Start a y-websocket server without `wss` support:
+* [@y/websocket-server](https://github.com/yjs/y-websocket-server/)
+* hocuspocus
+- y-sweet
+- y-redis
+- ypy-websocket
+- pycrdt-websocket
+- [yrs-warp](https://github.com/y-crdt/yrs-warp)
+- ...
+
+The fastest way to get started is to run the [@y/websocket-server](https://github.com/yjs/y-websocket-server/)
+backend. This package was previously included in y-websocket and now lives in a
+forkable repository.
+
+Install and start y-websocket-server:
 
 ```sh
-HOST=localhost PORT=1234 npx rozek/y-websocket
+npm install @y/websocket-server
+HOST=localhost PORT=1234 npx y-websocket
 ```
 
 If you need a server that also supports `wss`, use the following command:
@@ -120,7 +131,7 @@ If you don't want to run the Docker container in the background, just omit the `
 ### Client Code:
 
 ```js
-import * as Y from 'yjs'
+import * as Y from '@y/y'
 import { WebsocketProvider } from 'y-websocket'
 
 const doc = new Y.Doc()
@@ -205,43 +216,6 @@ wsOpts = {
   <b><code>wsProvider.on('connection-error', function(WSErrorEvent))</code></b>
   <dd>Fires when the underlying websocket connection closes with an error. It forwards the websocket event to this event handler.</dd>
 </dl>
-
-## Websocket Server
-
-Start a y-websocket server:
-
-```sh
-HOST=localhost PORT=1234 npx y-websocket
-```
-
-Since npm symlinks the `y-websocket` executable from your local `./node_modules/.bin` folder, you can simply run npx. The `PORT` environment variable already defaults to 1234, and `HOST` defaults to `localhost`.
-
-### Websocket Server with Persistence
-
-Persist document updates in a LevelDB database.
-
-See [LevelDB Persistence](https://github.com/yjs/y-leveldb) for more info.
-
-```sh
-HOST=localhost PORT=1234 YPERSISTENCE=./dbDir node ./node_modules/y-websocket/bin/server.js
-```
-
-### Websocket Server with HTTP callback
-
-Send a debounced callback to an HTTP server (`POST`) on document update. Note that this implementation doesn't implement a retry logic in case the `CALLBACK_URL` does not work.
-
-Can take the following ENV variables:
-
-* `CALLBACK_URL` : Callback server URL
-* `CALLBACK_DEBOUNCE_WAIT` : Debounce time between callbacks (in ms). Defaults to 2000 ms
-* `CALLBACK_DEBOUNCE_MAXWAIT` : Maximum time to wait before callback. Defaults to 10 seconds
-* `CALLBACK_TIMEOUT` : Timeout for the HTTP call. Defaults to 5 seconds
-* `CALLBACK_OBJECTS` : JSON of shared objects to get data (`'{"SHARED_OBJECT_NAME":"SHARED_OBJECT_TYPE}'`)
-
-```sh
-CALLBACK_URL=http://localhost:3000/ CALLBACK_OBJECTS='{"prosemirror":"XmlFragment"}' npm start
-```
-This sends a debounced callback to `localhost:3000` 2 seconds after receiving an update (default `DEBOUNCE_WAIT`) with the data of an XmlFragment named `"prosemirror"` in the body.
 
 ## License
 
